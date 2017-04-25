@@ -2,38 +2,42 @@ grammar avsc;
 
 goal: mainClass (classDeclaration)*;
 
-mainClass: 'class' identifier '{' 'public' 'static' 'void' 'main' '(' 'String' '[' ']' identifier ')' '{' statement '}' '}';
+mainClass: 'class' IDENTIFIER '{' 'public' 'static' 'void' 'main' '(' 'String' '[' ']' IDENTIFIER ')' '{' statement '}' '}';
 
-classDeclaration: 'class' identifier ('extends' identifier)? '{' ( varDeclaration )* ( methodDeclaration )* '}';
+classDeclaration: 'class' IDENTIFIER ('extends' IDENTIFIER)? '{' ( varDeclaration )* ( methodDeclaration )* '}';
 
-varDeclaration: type identifier ';';
+varDeclaration: type IDENTIFIER ';';
 
-methodDeclaration: 'public' type identifier '(' ( type identifier ( ',' type identifier )* )? ')' '{' ( varDeclaration )* ( statement )* 'return' expression ';' '}';
+methodDeclaration: 'public' type IDENTIFIER '(' ( type IDENTIFIER ( ',' type IDENTIFIER )* )? ')' '{' ( varDeclaration )* ( statement )* 'return' expression ';' '}';
 
 type: 'int' '[' ']'
 	| 'boolean'
 	| 'int'
-	| identifier;
+	| IDENTIFIER;
 
 statement: '{' ( statement )* '}'
 		| 'if' '(' expression ')' statement 'else' statement
 		| 'while' '(' expression ')' statement
 		| 'System.out.println' '(' expression ')' ';'
-		| identifier '=' expression ';'
-		| identifier '[' expression ']' '=' expression ';';
+		| IDENTIFIER '=' expression ';'
+		| IDENTIFIER '[' expression ']' '=' expression ';';
 
 expression: expression ( '&&' | '<' | '+' | '-' | '*' ) expression
 		| expression '[' expression ']'
 		| expression '.' 'length'
-		| expression '.' identifier '(' ( expression ( ',' expression )* )? ')'
-		| <INTEGER_LITERAL>
+		| expression '.' IDENTIFIER '(' ( expression ( ',' expression )* )? ')'
+		| INTEGER_LITERAL
 		| 'true'
 		| 'false'
-		| identifier
+		| IDENTIFIER
 		| 'this'
 		| 'new' 'int' '[' expression ']'
-		| 'new' identifier '(' ')'
+		| 'new' IDENTIFIER '(' ')'
 		| '!' expression
 		| '(' expression ')';
 
-identifier: <IDENTIFIER>;
+IDENTIFIER: [_a-zA-Z] ([_a-zA-Z0-9]*);
+
+INTEGER_LITERAL: '0' | [1-9] ([0-9]*);
+
+WS : [ \t\r\n]+ -> skip;
