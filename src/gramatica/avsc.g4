@@ -36,8 +36,12 @@ expression: expression ( '&&' | '<' | '+' | '-' | '*' ) expression
 		| '!' expression
 		| '(' expression ')';
 
-IDENTIFIER: [_a-zA-Z] ([_a-zA-Z0-9]*);
+IDENTIFIER: [_a-zA-Z] [_a-zA-Z0-9]*;
 
-INTEGER_LITERAL: '0' | [1-9] ([0-9]*);
+INTEGER_LITERAL: '0' | [1-9] [0-9]*;
 
-WS : [ \t\r\n]+ -> skip;
+SINGLE_LINE_COMMENT: '//' (~[\r\n])* [\r\n] -> skip;
+
+MULTI_LINE_COMMENT: '/*' (~['*/'])* '*/' -> skip;
+
+WHITESPACE : [ \t\r\n]+ -> skip;
