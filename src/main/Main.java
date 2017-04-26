@@ -6,19 +6,21 @@ import java.io.InputStream;
 
 import org.antlr.v4.runtime.ANTLRInputStream;
 import org.antlr.v4.runtime.CommonTokenStream;
+import org.antlr.v4.runtime.tree.ParseTree;
 
 import gramatica.avscLexer;
 import gramatica.avscParser;
 
-public class Teste {
+public class Main {
 
 	public static void main(String[] args) throws IOException {
-		InputStream stream = new FileInputStream("Teste.txt");
+		InputStream stream = new FileInputStream("Main.txt");
 		ANTLRInputStream input = new ANTLRInputStream(stream);
 		avscLexer lexer = new avscLexer(input);
 		CommonTokenStream token = new CommonTokenStream(lexer);
 		avscParser parser = new avscParser(token);
-		parser.goal();
+		ParseTree tree = parser.goal();
+		System.out.println(tree.toStringTree(parser));
 	}
 
 }
