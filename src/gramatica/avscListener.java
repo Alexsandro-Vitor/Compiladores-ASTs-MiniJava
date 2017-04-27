@@ -19,6 +19,16 @@ public interface avscListener extends ParseTreeListener {
 	 */
 	void exitMethodDeclaration(@NotNull avscParser.MethodDeclarationContext ctx);
 	/**
+	 * Enter a parse tree produced by {@link avscParser#whileLoop}.
+	 * @param ctx the parse tree
+	 */
+	void enterWhileLoop(@NotNull avscParser.WhileLoopContext ctx);
+	/**
+	 * Exit a parse tree produced by {@link avscParser#whileLoop}.
+	 * @param ctx the parse tree
+	 */
+	void exitWhileLoop(@NotNull avscParser.WhileLoopContext ctx);
+	/**
 	 * Enter a parse tree produced by {@link avscParser#print}.
 	 * @param ctx the parse tree
 	 */
@@ -78,6 +88,16 @@ public interface avscListener extends ParseTreeListener {
 	 * @param ctx the parse tree
 	 */
 	void exitType(@NotNull avscParser.TypeContext ctx);
+	/**
+	 * Enter a parse tree produced by {@link avscParser#ifElse}.
+	 * @param ctx the parse tree
+	 */
+	void enterIfElse(@NotNull avscParser.IfElseContext ctx);
+	/**
+	 * Exit a parse tree produced by {@link avscParser#ifElse}.
+	 * @param ctx the parse tree
+	 */
+	void exitIfElse(@NotNull avscParser.IfElseContext ctx);
 	/**
 	 * Enter a parse tree produced by {@link avscParser#varDeclaration}.
 	 * @param ctx the parse tree

@@ -16,13 +16,21 @@ type: 'int' '[' ']'
 	| IDENTIFIER;
 
 statement: '{' ( statement )* '}'
-		| 'if' '(' expression ')' statement 'else' statement
-		| 'while' '(' expression ')' statement
+		| ifElse
+		| whileLoop
 		| print
-		| IDENTIFIER '=' expression ';'
-		| IDENTIFIER '[' expression ']' '=' expression ';';
+		| attribution
+		| arrayAttribution;
+		
+ifElse: 'if' '(' expression ')' statement 'else' statement;
+
+whileLoop: 'while' '(' expression ')' statement;
 		
 print: 'System.out.println' '(' expression ')' ';';
+
+attribution: IDENTIFIER '=' expression ';';
+
+arrayAttribution: IDENTIFIER '[' expression ']' '=' expression ';';
 
 expression: 'true'
 		| 'false'

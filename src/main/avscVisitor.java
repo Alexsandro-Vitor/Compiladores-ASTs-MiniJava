@@ -122,15 +122,26 @@ public class avscVisitor {
 		System.out.println("Statement");
 		Exp exp1 = (Exp) this.visit(ctx.expression(0));
 		Exp exp2 = (Exp) this.visit(ctx.expression(1));
-		Statement st1 = (Statement) this.visit(ctx.statement(0));
-		Statement st2 = (Statement) this.visit(ctx.statement(1));
 		Identifier id = (ctx.IDENTIFIER() != null) ? new Identifier(ctx.IDENTIFIER().getText()) : null;
 		if (ctx.getChild(0).getText().equals("{")) return getStatementList(ctx.statement());
-		if (ctx.getChild(0).getText().equals("if")) return new If(exp1, st1, st2);
-		if (ctx.getChild(0).getText().equals("while")) return new While(exp1, st1);
+		if (ctx.ifElse() != null) return (If) this.visit(ctx.ifElse());
+		if (ctx.whileLoop() != null) return (While) this.visit(ctx.whileLoop());
 		if (ctx.print() != null) return (Print) this.visit(ctx.print());
 		if (ctx.getChild(1).getText().equals("=")) return new Assign(id, exp1);
 		return new ArrayAssign(id, exp1, exp2);
+	}
+	
+	public Object visitIfElse(IfElseContext ctx) {
+		Exp exp = (Exp) this.visit(ctx.expression());
+		Statement st1 = (Statement) this.visit(ctx.statement(0));
+		Statement st2 = (Statement) this.visit(ctx.statement(1));
+		return new If(exp, st1, st2);
+	}
+	
+	public Object visitWhile(WhileLoopContext ctx) {
+		Exp exp = (Exp) this.visit(ctx.expression());
+		Statement st = (Statement) this.visit(ctx.statement());
+		return new While(exp, st);
 	}
 	
 	public Object visitPrint(PrintContext ctx) {
