@@ -2,6 +2,7 @@ package main;
 
 import java.util.List;
 
+import org.antlr.v4.runtime.tree.ParseTree;
 import org.antlr.v4.runtime.tree.TerminalNode;
 
 import ast.And;
@@ -49,6 +50,18 @@ import ast.While;
 import gramatica.avscParser.*;
 
 public class avscVisitor {
+	public Object visit(ParseTree tree) {
+		if (tree instanceof GoalContext) return visitGoal((GoalContext) tree);
+		if (tree instanceof MainClassContext) return visitMainClass((MainClassContext) tree);
+		if (tree instanceof ClassDeclarationContext) return visitClassDeclaration((ClassDeclarationContext) tree);
+		if (tree instanceof VarDeclarationContext) return visitVarDeclaration((VarDeclarationContext) tree);
+		if (tree instanceof MethodDeclarationContext) return visitMethodDeclaration((MethodDeclarationContext) tree);
+		if (tree instanceof TypeContext) return visitType((TypeContext) tree);
+		if (tree instanceof StatementContext) return visitStatement((StatementContext) tree);
+		if (tree instanceof ExpressionContext) return visitExpression((ExpressionContext) tree);
+		return null;
+	}
+	
 	public Object visitGoal(GoalContext ctx) {
 		System.out.println("Goal");
 		MainClass main = (MainClass) this.visit(ctx.mainClass());
@@ -110,7 +123,7 @@ public class avscVisitor {
 		Exp exp2 = (Exp) this.visit(ctx.expression(1));
 		Statement st1 = (Statement) this.visit(ctx.statement(0));
 		Statement st2 = (Statement) this.visit(ctx.statement(1));
-		Identifier id = new Identifier(ctx.IDENTIFIER().getText());
+		Identifier id = (ctx.IDENTIFIER() != null) ? new Identifier(ctx.IDENTIFIER().getText()) : null;
 		if (ctx.getChild(0).getText().equals("{")) return getStatementList(ctx.statement());
 		if (ctx.getChild(0).getText().equals("if")) return new If(exp1, st1, st2);
 		if (ctx.getChild(0).getText().equals("while")) return new While(exp1, st1);
@@ -166,10 +179,6 @@ public class avscVisitor {
 		return new Call(exp1, id, getExpressionList(ctx.expression()));
 	}
 
-	public Object visit(Object obj) {
-		return obj;
-	}
-	
 	private ClassDeclList getClassDeclList(List<ClassDeclarationContext> list) {
 		ClassDeclList classe = new ClassDeclList();
 		for (int i = 0; i < list.size(); i++) {
