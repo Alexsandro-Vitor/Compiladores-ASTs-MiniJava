@@ -4,30 +4,49 @@ import java.util.List;
 
 import org.antlr.v4.runtime.tree.TerminalNode;
 
+import ast.And;
+import ast.ArrayAssign;
+import ast.ArrayLength;
+import ast.ArrayLookup;
+import ast.Assign;
+import ast.BooleanType;
+import ast.Call;
 import ast.ClassDecl;
 import ast.ClassDeclExtends;
 import ast.ClassDeclList;
 import ast.ClassDeclSimple;
 import ast.Exp;
+import ast.ExpList;
+import ast.False;
 import ast.Formal;
 import ast.FormalList;
 import ast.Identifier;
+import ast.IdentifierType;
+import ast.If;
+import ast.IntArrayType;
+import ast.IntegerLiteral;
+import ast.IntegerType;
+import ast.LessThan;
 import ast.MainClass;
 import ast.MethodDecl;
 import ast.MethodDeclList;
+import ast.Minus;
+import ast.NewArray;
+import ast.NewObject;
+import ast.Not;
+import ast.Plus;
+import ast.Print;
 import ast.Program;
 import ast.Statement;
 import ast.StatementList;
+import ast.This;
+import ast.Times;
+import ast.True;
 import ast.Type;
 import ast.VarDecl;
 import ast.VarDeclList;
-import gramatica.avscParser.ClassDeclarationContext;
-import gramatica.avscParser.GoalContext;
-import gramatica.avscParser.MainClassContext;
-import gramatica.avscParser.MethodDeclarationContext;
-import gramatica.avscParser.StatementContext;
-import gramatica.avscParser.TypeContext;
-import gramatica.avscParser.VarDeclarationContext;
+import ast.While;
+import gramatica.avscParser.*;
 
 public class avscVisitor {
 	public Object visitGoal(GoalContext ctx) {
@@ -39,38 +58,112 @@ public class avscVisitor {
 	
 	public Object visitMainClass(MainClassContext ctx) {
 		System.out.println("Main Class");
-		Identifier id1 = (Identifier) this.visit(ctx.IDENTIFIER(0).getText());
-		Identifier id2 = (Identifier) this.visit(ctx.IDENTIFIER(1).getText());
+		Identifier id1 = new Identifier(ctx.IDENTIFIER(0).getText());
+		Identifier id2 = new Identifier(ctx.IDENTIFIER(1).getText());
 		Statement st = (Statement) this.visit(ctx.statement());
 		return new MainClass(id1, id2, st);
 	}
 	
 	public Object visitClassDeclaration(ClassDeclarationContext ctx) {
 		System.out.println("Not a Main Class");
-		Identifier id1 = (Identifier) this.visit(ctx.IDENTIFIER(0).getText());
-		Identifier id2 = (Identifier) this.visit(ctx.IDENTIFIER(1).getText());
+		Identifier id1 = new Identifier(ctx.IDENTIFIER(0).getText());
 		VarDeclList var = getVarDeclList(ctx.varDeclaration());
 		MethodDeclList method = getMethodDeclList(ctx.methodDeclaration());
-		if (id2 == null) return new ClassDeclSimple(id1, var, method);
-		else return new ClassDeclExtends(id1, id2, var, method);
+		if (ctx.IDENTIFIER(1) == null) return new ClassDeclSimple(id1, var, method);
+		Identifier id2 = new Identifier(ctx.IDENTIFIER(1).getText());
+		return new ClassDeclExtends(id1, id2, var, method);
 	}
 	
 	public Object visitVarDeclaration(VarDeclarationContext ctx) {
 		System.out.println("Variable Declaration");
 		Type type = (Type) this.visit(ctx.type());
-		Identifier id = (Identifier) this.visit(ctx.IDENTIFIER());
+		Identifier id =  new Identifier(ctx.IDENTIFIER().getText());
 		return new VarDecl(type, id);
 	}
 	
 	public Object visitMethodDeclaration(MethodDeclarationContext ctx) {
 		System.out.println("Method Declaration");
 		Type type = (Type) this.visit(ctx.type(0));
-		Identifier id = (Identifier) this.visit(ctx.IDENTIFIER(0).getText());
+		Identifier id = new Identifier(ctx.IDENTIFIER(0).getText());
 		FormalList formal = getFormalList(ctx.type(), ctx.IDENTIFIER());
 		VarDeclList var = getVarDeclList(ctx.varDeclaration());
 		StatementList statement = getStatementList(ctx.statement());
 		Exp exp = (Exp) this.visit(ctx.expression());
 		return new MethodDecl(type, id, formal, var, statement, exp);
+	}
+	
+	public Object visitType(TypeContext ctx) {
+		System.out.println("Type");
+		String tipo = "";
+		for (int i = 0; i < ctx.getChildCount(); i++) {
+			tipo += ctx.getChild(i).getText();
+		}
+		if (tipo.equals("int[]")) return new IntArrayType();
+		if (tipo.equals("int")) return new IntegerType();
+		if (tipo.equals("boolean")) return new BooleanType();
+		return new IdentifierType(tipo);
+	}
+	
+	public Object visitStatement(StatementContext ctx) {
+		System.out.println("Statement");
+		Exp exp1 = (Exp) this.visit(ctx.expression(0));
+		Exp exp2 = (Exp) this.visit(ctx.expression(1));
+		Statement st1 = (Statement) this.visit(ctx.statement(0));
+		Statement st2 = (Statement) this.visit(ctx.statement(1));
+		Identifier id = new Identifier(ctx.IDENTIFIER().getText());
+		if (ctx.getChild(0).getText().equals("{")) return getStatementList(ctx.statement());
+		if (ctx.getChild(0).getText().equals("if")) return new If(exp1, st1, st2);
+		if (ctx.getChild(0).getText().equals("while")) return new While(exp1, st1);
+		if (ctx.getChild(0).getText().equals("System.out.println")) return new Print(exp1);
+		if (ctx.getChild(1).getText().equals("=")) return new Assign(id, exp1);
+		return new ArrayAssign(id, exp1, exp2);
+	}
+	
+	public Object visitExpression(ExpressionContext ctx) {
+		System.out.println("Expression");
+		Exp exp1 = (Exp) this.visit(ctx.expression(0));
+		Exp exp2 = (Exp) this.visit(ctx.expression(1));
+		Identifier id = (ctx.IDENTIFIER() != null) ? new Identifier(ctx.IDENTIFIER().getText()) : null;
+		IntegerLiteral int_lit = (ctx.INTEGER_LITERAL() != null) ? new IntegerLiteral(Integer.parseInt(ctx.INTEGER_LITERAL().getText())) : null;
+		switch (ctx.getChild(0).getText()) {
+		case "true":
+			return new True();
+		case "false":
+			return new False();
+		case "this":
+			return new This();
+		case "!":
+			return new Not(exp1);
+		case "(":
+			return exp1;
+		}
+		if (ctx.getChildCount() == 1) {
+			if (id != null) return id;
+			return int_lit;
+		}
+		switch (ctx.getChild(1).getText()) {
+		case "&&":
+			return new And(exp1, exp2);
+		case "<":
+			return new LessThan(exp1, exp2);
+		case "+":
+			return new Plus(exp1, exp2);
+		case "-":
+			return new Minus(exp1, exp2);
+		case "*":
+			return new Times(exp1, exp2);
+		case "[":
+			return new ArrayLookup(exp1, exp2);
+		case "int":
+			return new NewArray(exp1);
+		}
+		switch (ctx.getChild(2).getText()) {
+		case "length":
+			return new ArrayLength(exp1);
+		case "(":
+			return new NewObject(id);
+		}
+		return new Call(exp1, id, getExpressionList(ctx.expression()));
 	}
 
 	public Object visit(Object obj) {
@@ -115,5 +208,13 @@ public class avscVisitor {
 			statement.addElement((Statement) this.visit(list.get(i)));
 		}
 		return statement;
+	}
+	
+	private ExpList getExpressionList(List<ExpressionContext> list) {
+		ExpList exp = new ExpList();
+		for (int i = 1; i < list.size(); i++) {
+			exp.addElement((Exp) this.visit(list.get(i)));
+		}
+		return exp;
 	}
 }
