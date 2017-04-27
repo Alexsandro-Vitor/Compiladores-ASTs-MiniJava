@@ -18,23 +18,25 @@ type: 'int' '[' ']'
 statement: '{' ( statement )* '}'
 		| 'if' '(' expression ')' statement 'else' statement
 		| 'while' '(' expression ')' statement
-		| 'System.out.println' '(' expression ')' ';'
+		| print
 		| IDENTIFIER '=' expression ';'
 		| IDENTIFIER '[' expression ']' '=' expression ';';
+		
+print: 'System.out.println' '(' expression ')' ';';
 
-expression: expression ( '&&' | '<' | '+' | '-' | '*' ) expression
-		| expression '[' expression ']'
-		| expression '.' 'length'
-		| expression '.' IDENTIFIER '(' ( expression ( ',' expression )* )? ')'
-		| INTEGER_LITERAL
-		| 'true'
+expression: 'true'
 		| 'false'
-		| IDENTIFIER
 		| 'this'
-		| 'new' 'int' '[' expression ']'
-		| 'new' IDENTIFIER '(' ')'
 		| '!' expression
-		| '(' expression ')';
+		| '(' expression ')'
+		| IDENTIFIER
+		| INTEGER_LITERAL
+		| expression ( '&&' | '<' | '+' | '-' | '*' ) expression
+		| expression '[' expression ']'
+		| 'new' 'int' '[' expression ']'
+		| expression '.' 'length'
+		| 'new' IDENTIFIER '(' ')'
+		| expression '.' IDENTIFIER '(' ( expression ( ',' expression )* )? ')';
 
 IDENTIFIER: [_a-zA-Z] [_a-zA-Z0-9]*;
 

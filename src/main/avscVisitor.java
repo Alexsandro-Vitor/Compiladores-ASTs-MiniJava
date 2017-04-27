@@ -58,6 +58,7 @@ public class avscVisitor {
 		if (tree instanceof MethodDeclarationContext) return visitMethodDeclaration((MethodDeclarationContext) tree);
 		if (tree instanceof TypeContext) return visitType((TypeContext) tree);
 		if (tree instanceof StatementContext) return visitStatement((StatementContext) tree);
+		if (tree instanceof PrintContext) return visitPrint((PrintContext) tree);
 		if (tree instanceof ExpressionContext) return visitExpression((ExpressionContext) tree);
 		return null;
 	}
@@ -127,9 +128,13 @@ public class avscVisitor {
 		if (ctx.getChild(0).getText().equals("{")) return getStatementList(ctx.statement());
 		if (ctx.getChild(0).getText().equals("if")) return new If(exp1, st1, st2);
 		if (ctx.getChild(0).getText().equals("while")) return new While(exp1, st1);
-		if (ctx.getChild(0).getText().equals("System.out.println")) return new Print(exp1);
+		if (ctx.print() != null) return (Print) this.visit(ctx.print());
 		if (ctx.getChild(1).getText().equals("=")) return new Assign(id, exp1);
 		return new ArrayAssign(id, exp1, exp2);
+	}
+	
+	public Object visitPrint(PrintContext ctx) {
+		return new Print((Exp) this.visit(ctx.expression()));
 	}
 	
 	public Object visitExpression(ExpressionContext ctx) {

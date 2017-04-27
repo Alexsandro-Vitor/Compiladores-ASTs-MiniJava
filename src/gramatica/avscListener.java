@@ -19,6 +19,16 @@ public interface avscListener extends ParseTreeListener {
 	 */
 	void exitMethodDeclaration(@NotNull avscParser.MethodDeclarationContext ctx);
 	/**
+	 * Enter a parse tree produced by {@link avscParser#print}.
+	 * @param ctx the parse tree
+	 */
+	void enterPrint(@NotNull avscParser.PrintContext ctx);
+	/**
+	 * Exit a parse tree produced by {@link avscParser#print}.
+	 * @param ctx the parse tree
+	 */
+	void exitPrint(@NotNull avscParser.PrintContext ctx);
+	/**
 	 * Enter a parse tree produced by {@link avscParser#goal}.
 	 * @param ctx the parse tree
 	 */
