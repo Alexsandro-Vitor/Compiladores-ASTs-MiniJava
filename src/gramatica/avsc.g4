@@ -15,12 +15,14 @@ type: 'int' '[' ']'
 	| 'int'
 	| IDENTIFIER;
 
-statement: '{' ( statement )* '}'
+statement: statementList
 		| ifElse
 		| whileLoop
 		| print
-		| attribution
-		| arrayAttribution;
+		| assign
+		| arrayAssign;
+		
+statementList: '{' ( statement )* '}';
 		
 ifElse: 'if' '(' expression ')' statement 'else' statement;
 
@@ -28,9 +30,9 @@ whileLoop: 'while' '(' expression ')' statement;
 		
 print: 'System.out.println' '(' expression ')' ';';
 
-attribution: IDENTIFIER '=' expression ';';
+assign: IDENTIFIER '=' expression ';';
 
-arrayAttribution: IDENTIFIER '[' expression ']' '=' expression ';';
+arrayAssign: IDENTIFIER '[' expression ']' '=' expression ';';
 
 expression: 'true'
 		| 'false'

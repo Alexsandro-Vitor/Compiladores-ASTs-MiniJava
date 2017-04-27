@@ -58,7 +58,12 @@ public class avscVisitor {
 		if (tree instanceof MethodDeclarationContext) return visitMethodDeclaration((MethodDeclarationContext) tree);
 		if (tree instanceof TypeContext) return visitType((TypeContext) tree);
 		if (tree instanceof StatementContext) return visitStatement((StatementContext) tree);
+		if (tree instanceof StatementListContext) return visitStatementList((StatementListContext) tree);
+		if (tree instanceof IfElseContext) return visitIfElse((IfElseContext) tree);
+		if (tree instanceof WhileLoopContext) return visitWhile((WhileLoopContext) tree);
 		if (tree instanceof PrintContext) return visitPrint((PrintContext) tree);
+		if (tree instanceof AssignContext) return visitAssign((AssignContext) tree);
+		if (tree instanceof ArrayAssignContext) return visitArrayAssign((ArrayAssignContext) tree);
 		if (tree instanceof ExpressionContext) return visitExpression((ExpressionContext) tree);
 		return null;
 	}
@@ -120,15 +125,18 @@ public class avscVisitor {
 	
 	public Object visitStatement(StatementContext ctx) {
 		System.out.println("Statement");
-		Exp exp1 = (Exp) this.visit(ctx.expression(0));
-		Exp exp2 = (Exp) this.visit(ctx.expression(1));
-		Identifier id = (ctx.IDENTIFIER() != null) ? new Identifier(ctx.IDENTIFIER().getText()) : null;
-		if (ctx.getChild(0).getText().equals("{")) return getStatementList(ctx.statement());
+		if (ctx.statementList() != null) return (StatementList) this.visit(ctx.statementList());
 		if (ctx.ifElse() != null) return (If) this.visit(ctx.ifElse());
 		if (ctx.whileLoop() != null) return (While) this.visit(ctx.whileLoop());
 		if (ctx.print() != null) return (Print) this.visit(ctx.print());
-		if (ctx.getChild(1).getText().equals("=")) return new Assign(id, exp1);
-		return new ArrayAssign(id, exp1, exp2);
+		if (ctx.assign() != null) return (Assign) this.visit(ctx.assign()); 
+		if (ctx.arrayAssign() != null) return (ArrayAssign) this.visit(ctx.arrayAssign());
+		return null;
+	}
+	
+	public Object visitStatementList(StatementListContext ctx) {
+		return getStatementList(ctx.statement());
+		
 	}
 	
 	public Object visitIfElse(IfElseContext ctx) {
@@ -146,6 +154,19 @@ public class avscVisitor {
 	
 	public Object visitPrint(PrintContext ctx) {
 		return new Print((Exp) this.visit(ctx.expression()));
+	}
+	
+	public Object visitAssign(AssignContext ctx) {
+		Identifier id = new Identifier(ctx.IDENTIFIER().getText());
+		Exp exp = (Exp) this.visit(ctx.expression());
+		return new Assign(id, exp);
+	}
+	
+	public Object visitArrayAssign(ArrayAssignContext ctx) {
+		Identifier id = new Identifier(ctx.IDENTIFIER().getText());
+		Exp exp1 = (Exp) this.visit(ctx.expression(0));
+		Exp exp2 = (Exp) this.visit(ctx.expression(1));
+		return new ArrayAssign(id, exp1, exp2);
 	}
 	
 	public Object visitExpression(ExpressionContext ctx) {
