@@ -37,16 +37,22 @@ arrayAssign: IDENTIFIER '[' expression ']' '=' expression ';';
 expression: 'true'
 		| 'false'
 		| 'this'
-		| '!' expression
+		| not
 		| '(' expression ')'
 		| IDENTIFIER
 		| INTEGER_LITERAL
 		| expression ( '&&' | '<' | '+' | '-' | '*' ) expression
 		| expression '[' expression ']'
-		| 'new' 'int' '[' expression ']'
+		| newArray
 		| expression '.' 'length'
-		| 'new' IDENTIFIER '(' ')'
+		| newObject
 		| expression '.' IDENTIFIER '(' ( expression ( ',' expression )* )? ')';
+		
+not: '!' expression;
+		
+newArray: 'new' 'int' '[' expression ']';
+
+newObject: 'new' IDENTIFIER '(' ')';
 
 IDENTIFIER: [_a-zA-Z] [_a-zA-Z0-9]*;
 

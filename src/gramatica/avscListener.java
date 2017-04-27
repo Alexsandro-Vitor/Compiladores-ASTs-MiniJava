@@ -69,6 +69,16 @@ public interface avscListener extends ParseTreeListener {
 	 */
 	void exitArrayAssign(@NotNull avscParser.ArrayAssignContext ctx);
 	/**
+	 * Enter a parse tree produced by {@link avscParser#newArray}.
+	 * @param ctx the parse tree
+	 */
+	void enterNewArray(@NotNull avscParser.NewArrayContext ctx);
+	/**
+	 * Exit a parse tree produced by {@link avscParser#newArray}.
+	 * @param ctx the parse tree
+	 */
+	void exitNewArray(@NotNull avscParser.NewArrayContext ctx);
+	/**
 	 * Enter a parse tree produced by {@link avscParser#type}.
 	 * @param ctx the parse tree
 	 */
@@ -108,6 +118,26 @@ public interface avscListener extends ParseTreeListener {
 	 * @param ctx the parse tree
 	 */
 	void exitPrint(@NotNull avscParser.PrintContext ctx);
+	/**
+	 * Enter a parse tree produced by {@link avscParser#not}.
+	 * @param ctx the parse tree
+	 */
+	void enterNot(@NotNull avscParser.NotContext ctx);
+	/**
+	 * Exit a parse tree produced by {@link avscParser#not}.
+	 * @param ctx the parse tree
+	 */
+	void exitNot(@NotNull avscParser.NotContext ctx);
+	/**
+	 * Enter a parse tree produced by {@link avscParser#newObject}.
+	 * @param ctx the parse tree
+	 */
+	void enterNewObject(@NotNull avscParser.NewObjectContext ctx);
+	/**
+	 * Exit a parse tree produced by {@link avscParser#newObject}.
+	 * @param ctx the parse tree
+	 */
+	void exitNewObject(@NotNull avscParser.NewObjectContext ctx);
 	/**
 	 * Enter a parse tree produced by {@link avscParser#statementList}.
 	 * @param ctx the parse tree
