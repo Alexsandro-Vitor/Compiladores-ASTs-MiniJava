@@ -8,8 +8,10 @@ import org.antlr.v4.runtime.ANTLRInputStream;
 import org.antlr.v4.runtime.CommonTokenStream;
 import org.antlr.v4.runtime.tree.ParseTree;
 
+import ast.Program;
 import gramatica.avscLexer;
 import gramatica.avscParser;
+import visitor.PrettyPrintVisitor;
 
 public class Main {
 
@@ -21,6 +23,9 @@ public class Main {
 		avscParser parser = new avscParser(token);
 		ParseTree tree = parser.goal();
 		System.out.println(tree.toStringTree(parser));
+		avscVisitor visitor = new avscVisitor();
+		Program program = (Program) visitor.visit(tree);
+		program.accept(new PrettyPrintVisitor());
 	}
 
 }
