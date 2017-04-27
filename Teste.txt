@@ -1,5 +1,5 @@
 class Classe {
-	public static void main(String[] args ) {
-		System.out.println(3 + 4 * 5);
-	}
-}
+	public static void main(String[] args) {
+		System.out.println(3 + (4 * 5));
+	}	//tESTANDO
+}/* tESTANDO */
