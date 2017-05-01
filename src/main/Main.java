@@ -6,11 +6,11 @@ import java.io.InputStream;
 
 import org.antlr.v4.runtime.ANTLRInputStream;
 import org.antlr.v4.runtime.CommonTokenStream;
-import org.antlr.v4.runtime.tree.ParseTree;
 
 import ast.Program;
 import gramatica.avscLexer;
 import gramatica.avscParser;
+import gramatica.avscParser.GoalContext;
 import visitor.PrettyPrintVisitor;
 
 public class Main {
@@ -21,10 +21,10 @@ public class Main {
 		avscLexer lexer = new avscLexer(input);
 		CommonTokenStream token = new CommonTokenStream(lexer);
 		avscParser parser = new avscParser(token);
-		ParseTree tree = parser.goal();
+		GoalContext tree = parser.goal();
 		System.out.println(tree.toStringTree(parser));
 		avscVisitor visitor = new avscVisitor();
-		Program program = (Program) visitor.visit(tree);
+		Program program = visitor.visit(tree);
 		program.accept(new PrettyPrintVisitor());
 	}
 
