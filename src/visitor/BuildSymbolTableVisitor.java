@@ -66,6 +66,9 @@ public class BuildSymbolTableVisitor implements Visitor {
 	// Identifier i1,i2;
 	// Statement s;
 	public void visit(MainClass n) {
+		System.out.println("Classe principal "+n.i1.s);
+		symbolTable.addClass(n.i1.s, null);
+		currClass = symbolTable.getClass(n.i1.s);
 		n.i1.accept(this);
 		n.i2.accept(this);
 		n.s.accept(this);
@@ -75,8 +78,12 @@ public class BuildSymbolTableVisitor implements Visitor {
 	// VarDeclList vl;
 	// MethodDeclList ml;
 	public void visit(ClassDeclSimple n) {
+		System.out.println("Classe "+n.i.s);
+		symbolTable.addClass(n.i.s, null);
+		currClass = symbolTable.getClass(n.i.s);
 		n.i.accept(this);
 		for (int i = 0; i < n.vl.size(); i++) {
+			currClass.addVar(n.vl.elementAt(i).i.s, n.vl.elementAt(i).t);
 			n.vl.elementAt(i).accept(this);
 		}
 		for (int i = 0; i < n.ml.size(); i++) {
@@ -89,9 +96,13 @@ public class BuildSymbolTableVisitor implements Visitor {
 	// VarDeclList vl;
 	// MethodDeclList ml;
 	public void visit(ClassDeclExtends n) {
+		System.out.println("Classe "+n.i.s+" derivada de "+n.j.s);
+		symbolTable.addClass(n.i.s, currClass.getId());
+		currClass = symbolTable.getClass(n.i.s);
 		n.i.accept(this);
 		n.j.accept(this);
 		for (int i = 0; i < n.vl.size(); i++) {
+			currClass.addVar(n.vl.elementAt(i).i.s, n.vl.elementAt(i).t);
 			n.vl.elementAt(i).accept(this);
 		}
 		for (int i = 0; i < n.ml.size(); i++) {
@@ -113,12 +124,17 @@ public class BuildSymbolTableVisitor implements Visitor {
 	// StatementList sl;
 	// Exp e;
 	public void visit(MethodDecl n) {
+		System.out.println("Método "+n.i.s);
+		currClass.addMethod(n.i.s, n.t);
+		currMethod = symbolTable.getMethod(n.i.s, currClass.getId());
 		n.t.accept(this);
 		n.i.accept(this);
 		for (int i = 0; i < n.fl.size(); i++) {
+			currMethod.addParam(n.fl.elementAt(i).i.s, n.fl.elementAt(i).t);
 			n.fl.elementAt(i).accept(this);
 		}
 		for (int i = 0; i < n.vl.size(); i++) {
+			currMethod.addVar(n.vl.elementAt(i).i.s, n.vl.elementAt(i).t);
 			n.vl.elementAt(i).accept(this);
 		}
 		for (int i = 0; i < n.sl.size(); i++) {
