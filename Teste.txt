@@ -6,3 +6,12 @@ class Classe {
 		}
 	}	//tESTANDO
 }/* tESTANDO */
+
+class OutraClasse {
+	int x;
+	int y;
+	int z;
+	public int somaTudo() {
+		return x + y + z;
+	}
+}
