@@ -11,7 +11,9 @@ import ast.Program;
 import gramatica.avscLexer;
 import gramatica.avscParser;
 import gramatica.avscParser.GoalContext;
+import visitor.BuildSymbolTableVisitor;
 import visitor.PrettyPrintVisitor;
+import visitor.TypeCheckVisitor;
 
 public class Main {
 
@@ -26,6 +28,11 @@ public class Main {
 		avscVisitor visitor = new avscVisitor();
 		Program program = visitor.visit(tree);
 		program.accept(new PrettyPrintVisitor());
+		
+		//Projeto 3
+		BuildSymbolTableVisitor buildSTVisitor = new BuildSymbolTableVisitor();
+		program.accept(buildSTVisitor);
+		program.accept(new TypeCheckVisitor(buildSTVisitor.getSymbolTable()));
 	}
 
 }
