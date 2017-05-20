@@ -1,5 +1,7 @@
 package visitor;
 
+import symboltable.Class;
+import symboltable.Method;
 import symboltable.SymbolTable;
 import ast.And;
 import ast.ArrayAssign;
@@ -38,10 +40,23 @@ import ast.VarDecl;
 import ast.While;
 
 public class TypeCheckVisitor implements TypeVisitor {
-
+	private static class WrongTypeException extends Exception {
+		public WrongTypeException() {
+			super("O tipo está incorreto");
+		}
+	}
+	
+	private static class DiffTypeException extends Exception {
+		public DiffTypeException() {
+			super("Os tipos são diferentes");
+		}
+	}
+	
 	private SymbolTable symbolTable;
+	private Class currClass;
+	private Method currMethod;
 
-	TypeCheckVisitor(SymbolTable st) {
+	public TypeCheckVisitor(SymbolTable st) {
 		symbolTable = st;
 	}
 
@@ -58,6 +73,7 @@ public class TypeCheckVisitor implements TypeVisitor {
 	// Identifier i1,i2;
 	// Statement s;
 	public Type visit(MainClass n) {
+		currClass = symbolTable.getClass(n.i1.s);
 		n.i1.accept(this);
 		n.i2.accept(this);
 		n.s.accept(this);
@@ -68,6 +84,7 @@ public class TypeCheckVisitor implements TypeVisitor {
 	// VarDeclList vl;
 	// MethodDeclList ml;
 	public Type visit(ClassDeclSimple n) {
+		currClass = symbolTable.getClass(n.i.s);
 		n.i.accept(this);
 		for (int i = 0; i < n.vl.size(); i++) {
 			n.vl.elementAt(i).accept(this);
@@ -83,6 +100,7 @@ public class TypeCheckVisitor implements TypeVisitor {
 	// VarDeclList vl;
 	// MethodDeclList ml;
 	public Type visit(ClassDeclExtends n) {
+		currClass = symbolTable.getClass(n.i.s);
 		n.i.accept(this);
 		n.j.accept(this);
 		for (int i = 0; i < n.vl.size(); i++) {
@@ -109,6 +127,7 @@ public class TypeCheckVisitor implements TypeVisitor {
 	// StatementList sl;
 	// Exp e;
 	public Type visit(MethodDecl n) {
+		currMethod = symbolTable.getMethod(n.i.s, currClass.getId());
 		n.t.accept(this);
 		n.i.accept(this);
 		for (int i = 0; i < n.fl.size(); i++) {
@@ -133,20 +152,20 @@ public class TypeCheckVisitor implements TypeVisitor {
 	}
 
 	public Type visit(IntArrayType n) {
-		return null;
+		return n;
 	}
 
 	public Type visit(BooleanType n) {
-		return null;
+		return n;
 	}
 
 	public Type visit(IntegerType n) {
-		return null;
+		return n;
 	}
 
 	// String s;
 	public Type visit(IdentifierType n) {
-		return null;
+		return n;
 	}
 
 	// StatementList sl;
@@ -160,7 +179,7 @@ public class TypeCheckVisitor implements TypeVisitor {
 	// Exp e;
 	// Statement s1,s2;
 	public Type visit(If n) {
-		n.e.accept(this);
+		if (!(n.e.accept(this) instanceof BooleanType)) new DiffTypeException().printStackTrace();
 		n.s1.accept(this);
 		n.s2.accept(this);
 		return null;
@@ -169,7 +188,7 @@ public class TypeCheckVisitor implements TypeVisitor {
 	// Exp e;
 	// Statement s;
 	public Type visit(While n) {
-		n.e.accept(this);
+		if (!(n.e.accept(this) instanceof BooleanType)) new DiffTypeException().printStackTrace();
 		n.s.accept(this);
 		return null;
 	}
@@ -183,72 +202,82 @@ public class TypeCheckVisitor implements TypeVisitor {
 	// Identifier i;
 	// Exp e;
 	public Type visit(Assign n) {
-		n.i.accept(this);
-		n.e.accept(this);
+		if (!symbolTable.compareTypes(n.i.accept(this), n.e.accept(this))) new DiffTypeException().printStackTrace();
 		return null;
 	}
 
 	// Identifier i;
 	// Exp e1,e2;
 	public Type visit(ArrayAssign n) {
-		n.i.accept(this);
-		n.e1.accept(this);
-		n.e2.accept(this);
+		if (!(n.i.accept(this) instanceof IntArrayType)) new WrongTypeException().printStackTrace();
+		if (!(n.e1.accept(this) instanceof IntegerType)) new WrongTypeException().printStackTrace();
+		if (!(n.e2.accept(this) instanceof IntegerType)) new WrongTypeException().printStackTrace();
 		return null;
 	}
 
 	// Exp e1,e2;
 	public Type visit(And n) {
-		n.e1.accept(this);
-		n.e2.accept(this);
-		return null;
+		Type t1 = n.e1.accept(this);
+		Type t2 = n.e2.accept(this);
+		if (!symbolTable.compareTypes(t1, t2)) new DiffTypeException().printStackTrace();
+		if (!(t1 instanceof BooleanType)) new WrongTypeException().printStackTrace();
+		return new BooleanType();
 	}
 
 	// Exp e1,e2;
 	public Type visit(LessThan n) {
-		n.e1.accept(this);
-		n.e2.accept(this);
-		return null;
+		Type t1 = n.e1.accept(this);
+		Type t2 = n.e2.accept(this);
+		if (!symbolTable.compareTypes(t1, t2)) new DiffTypeException().printStackTrace();
+		if (!(t1 instanceof IntegerType)) new WrongTypeException().printStackTrace();
+		return new BooleanType();
 	}
 
 	// Exp e1,e2;
 	public Type visit(Plus n) {
-		n.e1.accept(this);
-		n.e2.accept(this);
-		return null;
+		Type t1 = n.e1.accept(this);
+		Type t2 = n.e2.accept(this);
+		if (!symbolTable.compareTypes(t1, t2)) new DiffTypeException().printStackTrace();
+		if (!(t1 instanceof IntegerType)) new WrongTypeException().printStackTrace();
+		return new IntegerType();
 	}
 
 	// Exp e1,e2;
 	public Type visit(Minus n) {
-		n.e1.accept(this);
-		n.e2.accept(this);
-		return null;
+		Type t1 = n.e1.accept(this);
+		Type t2 = n.e2.accept(this);
+		if (!symbolTable.compareTypes(t1, t2)) new DiffTypeException().printStackTrace();
+		if (!(t1 instanceof IntegerType)) new WrongTypeException().printStackTrace();
+		return new IntegerType();
 	}
 
 	// Exp e1,e2;
 	public Type visit(Times n) {
-		n.e1.accept(this);
-		n.e2.accept(this);
-		return null;
+		Type t1 = n.e1.accept(this);
+		Type t2 = n.e2.accept(this);
+		if (!symbolTable.compareTypes(t1, t2)) new DiffTypeException().printStackTrace();
+		if (!(t1 instanceof IntegerType)) new WrongTypeException().printStackTrace();
+		return new IntegerType();
 	}
 
 	// Exp e1,e2;
 	public Type visit(ArrayLookup n) {
-		n.e1.accept(this);
-		n.e2.accept(this);
-		return null;
+		if (!(n.e1.accept(this) instanceof IntArrayType)) new DiffTypeException().printStackTrace();
+		if (!(n.e2.accept(this) instanceof IntegerType)) new DiffTypeException().printStackTrace();
+		return new IntegerType();
 	}
 
 	// Exp e;
 	public Type visit(ArrayLength n) {
-		n.e.accept(this);
-		return null;
+		if (!(n.e.accept(this) instanceof IntArrayType)) new WrongTypeException().printStackTrace();
+		return new IntegerType();
 	}
 
 	// Exp e;
 	// Identifier i;
 	// ExpList el;
 	public Type visit(Call n) {
+		//Falta fazer esse
 		n.e.accept(this);
 		n.i.accept(this);
 		for (int i = 0; i < n.el.size(); i++) {
@@ -259,45 +288,45 @@ public class TypeCheckVisitor implements TypeVisitor {
 
 	// int i;
 	public Type visit(IntegerLiteral n) {
-		return null;
+		return new IntegerType();
 	}
 
 	public Type visit(True n) {
-		return null;
+		return new BooleanType();
 	}
 
 	public Type visit(False n) {
-		return null;
+		return new BooleanType();
 	}
 
 	// String s;
 	public Type visit(IdentifierExp n) {
-		return null;
+		return symbolTable.getVarType(currMethod, currClass, n.s);
 	}
 
 	public Type visit(This n) {
-		return null;
+		return currClass.type();
 	}
 
 	// Exp e;
 	public Type visit(NewArray n) {
-		n.e.accept(this);
+		if (!(n.e.accept(this) instanceof IntegerType)) new WrongTypeException().printStackTrace();
 		return null;
 	}
 
 	// Identifier i;
 	public Type visit(NewObject n) {
-		return null;
+		return new IdentifierType(n.i.s);
 	}
 
 	// Exp e;
 	public Type visit(Not n) {
-		n.e.accept(this);
-		return null;
+		if (!(n.e.accept(this) instanceof BooleanType)) new WrongTypeException().printStackTrace();
+		return new BooleanType();
 	}
 
 	// String s;
 	public Type visit(Identifier n) {
-		return null;
+		return new IdentifierType(n.s);
 	}
 }
