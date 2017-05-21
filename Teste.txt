@@ -1,15 +1,19 @@
 class Classe {
 	public static void main(String[] args) {
-		System.out.println(3 + (4 * 5));
+		System.out.println(5);
 	}	//tESTANDO
 }/* tESTANDO */
 
 class OutraClasse {
 	int x;
-	int y;
+	Acre y;
 	int z;
 	public int somaTudo() {
-		int a;
 		return x + y + z;
+	}
+	
+	public OutraClasse metodo() {
+		OutraClasse x;
+		return (x.somaTudo());
 	}
 }

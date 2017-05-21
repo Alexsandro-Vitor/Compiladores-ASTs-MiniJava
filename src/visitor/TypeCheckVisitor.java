@@ -47,14 +47,20 @@ public class TypeCheckVisitor implements TypeVisitor {
 	}
 	
 	private static class DiffTypeException extends Exception {
-		public DiffTypeException() {
-			super("Os tipos são diferentes");
+		public DiffTypeException(String a, String b) {
+			super("Os tipos \"" + a + "\" e \"" + b + "\" são diferentes");
+		}
+	}
+	
+	private static class TypeDoesntExistException extends Exception {
+		public TypeDoesntExistException(String classe) {
+			super("A classe " + classe + " não foi implemetada");
 		}
 	}
 	
 	private SymbolTable symbolTable;
-	private Class currClass;
-	private Method currMethod;
+	private Class currClass;	//Criei para saber em que classe está o método
+	private Method currMethod;	//Criei para saber em que método está a variável
 
 	public TypeCheckVisitor(SymbolTable st) {
 		symbolTable = st;
@@ -102,6 +108,7 @@ public class TypeCheckVisitor implements TypeVisitor {
 	public Type visit(ClassDeclExtends n) {
 		currClass = symbolTable.getClass(n.i.s);
 		n.i.accept(this);
+		if (!(symbolTable.containsClass(n.j.s))) new TypeDoesntExistException(n.j.s).printStackTrace();
 		n.j.accept(this);
 		for (int i = 0; i < n.vl.size(); i++) {
 			n.vl.elementAt(i).accept(this);
@@ -165,6 +172,7 @@ public class TypeCheckVisitor implements TypeVisitor {
 
 	// String s;
 	public Type visit(IdentifierType n) {
+		if (!(symbolTable.containsClass(n.s))) new TypeDoesntExistException(n.s).printStackTrace();
 		return n;
 	}
 
@@ -175,11 +183,21 @@ public class TypeCheckVisitor implements TypeVisitor {
 		}
 		return null;
 	}
+	
+	private String getTypeName(Type t) {
+		if (t instanceof BooleanType) return "boolean";
+		else if (t instanceof IntegerType) return "int";
+		else if (t instanceof IntArrayType) return "int[]";
+		else {
+			return ((IdentifierType) t).s;
+		}
+	}
 
 	// Exp e;
 	// Statement s1,s2;
 	public Type visit(If n) {
-		if (!(n.e.accept(this) instanceof BooleanType)) new DiffTypeException().printStackTrace();
+		Type t = n.e.accept(this);
+		if (!(t instanceof BooleanType)) new DiffTypeException(getTypeName(t), "boolean").printStackTrace();
 		n.s1.accept(this);
 		n.s2.accept(this);
 		return null;
@@ -188,7 +206,8 @@ public class TypeCheckVisitor implements TypeVisitor {
 	// Exp e;
 	// Statement s;
 	public Type visit(While n) {
-		if (!(n.e.accept(this) instanceof BooleanType)) new DiffTypeException().printStackTrace();
+		Type t = n.e.accept(this);
+		if (!(t instanceof BooleanType)) new DiffTypeException(getTypeName(t), "boolean").printStackTrace();
 		n.s.accept(this);
 		return null;
 	}
@@ -202,14 +221,16 @@ public class TypeCheckVisitor implements TypeVisitor {
 	// Identifier i;
 	// Exp e;
 	public Type visit(Assign n) {
-		if (!symbolTable.compareTypes(n.i.accept(this), n.e.accept(this))) new DiffTypeException().printStackTrace();
+		Type t1 = symbolTable.getVarType(currMethod, currClass, n.i.s);
+		Type t2 = n.e.accept(this);
+		if (!symbolTable.compareTypes(t1, t2)) new DiffTypeException(getTypeName(t1), getTypeName(t2)).printStackTrace();
 		return null;
 	}
 
 	// Identifier i;
 	// Exp e1,e2;
 	public Type visit(ArrayAssign n) {
-		if (!(n.i.accept(this) instanceof IntArrayType)) new WrongTypeException().printStackTrace();
+		if (!(symbolTable.getVarType(currMethod, currClass, n.i.s) instanceof IntArrayType)) new WrongTypeException().printStackTrace();
 		if (!(n.e1.accept(this) instanceof IntegerType)) new WrongTypeException().printStackTrace();
 		if (!(n.e2.accept(this) instanceof IntegerType)) new WrongTypeException().printStackTrace();
 		return null;
@@ -219,7 +240,7 @@ public class TypeCheckVisitor implements TypeVisitor {
 	public Type visit(And n) {
 		Type t1 = n.e1.accept(this);
 		Type t2 = n.e2.accept(this);
-		if (!symbolTable.compareTypes(t1, t2)) new DiffTypeException().printStackTrace();
+		if (!symbolTable.compareTypes(t1, t2)) new DiffTypeException(getTypeName(t1), getTypeName(t2)).printStackTrace();
 		if (!(t1 instanceof BooleanType)) new WrongTypeException().printStackTrace();
 		return new BooleanType();
 	}
@@ -228,7 +249,7 @@ public class TypeCheckVisitor implements TypeVisitor {
 	public Type visit(LessThan n) {
 		Type t1 = n.e1.accept(this);
 		Type t2 = n.e2.accept(this);
-		if (!symbolTable.compareTypes(t1, t2)) new DiffTypeException().printStackTrace();
+		if (!symbolTable.compareTypes(t1, t2)) new DiffTypeException(getTypeName(t1), getTypeName(t2)).printStackTrace();
 		if (!(t1 instanceof IntegerType)) new WrongTypeException().printStackTrace();
 		return new BooleanType();
 	}
@@ -237,7 +258,7 @@ public class TypeCheckVisitor implements TypeVisitor {
 	public Type visit(Plus n) {
 		Type t1 = n.e1.accept(this);
 		Type t2 = n.e2.accept(this);
-		if (!symbolTable.compareTypes(t1, t2)) new DiffTypeException().printStackTrace();
+		if (!symbolTable.compareTypes(t1, t2)) new DiffTypeException(getTypeName(t1), getTypeName(t2)).printStackTrace();
 		if (!(t1 instanceof IntegerType)) new WrongTypeException().printStackTrace();
 		return new IntegerType();
 	}
@@ -246,7 +267,7 @@ public class TypeCheckVisitor implements TypeVisitor {
 	public Type visit(Minus n) {
 		Type t1 = n.e1.accept(this);
 		Type t2 = n.e2.accept(this);
-		if (!symbolTable.compareTypes(t1, t2)) new DiffTypeException().printStackTrace();
+		if (!symbolTable.compareTypes(t1, t2)) new DiffTypeException(getTypeName(t1), getTypeName(t2)).printStackTrace();
 		if (!(t1 instanceof IntegerType)) new WrongTypeException().printStackTrace();
 		return new IntegerType();
 	}
@@ -255,15 +276,17 @@ public class TypeCheckVisitor implements TypeVisitor {
 	public Type visit(Times n) {
 		Type t1 = n.e1.accept(this);
 		Type t2 = n.e2.accept(this);
-		if (!symbolTable.compareTypes(t1, t2)) new DiffTypeException().printStackTrace();
+		if (!symbolTable.compareTypes(t1, t2)) new DiffTypeException(getTypeName(t1), getTypeName(t2)).printStackTrace();
 		if (!(t1 instanceof IntegerType)) new WrongTypeException().printStackTrace();
 		return new IntegerType();
 	}
 
 	// Exp e1,e2;
 	public Type visit(ArrayLookup n) {
-		if (!(n.e1.accept(this) instanceof IntArrayType)) new DiffTypeException().printStackTrace();
-		if (!(n.e2.accept(this) instanceof IntegerType)) new DiffTypeException().printStackTrace();
+		Type t1 = n.e1.accept(this);
+		Type t2 = n.e2.accept(this);
+		if (!(t1 instanceof IntArrayType)) new DiffTypeException(getTypeName(t1), "int[]").printStackTrace();
+		if (!(t2 instanceof IntegerType)) new DiffTypeException(getTypeName(t2), "int").printStackTrace();
 		return new IntegerType();
 	}
 
@@ -277,12 +300,20 @@ public class TypeCheckVisitor implements TypeVisitor {
 	// Identifier i;
 	// ExpList el;
 	public Type visit(Call n) {
-		//Falta fazer esse
-		n.e.accept(this);
-		n.i.accept(this);
-		for (int i = 0; i < n.el.size(); i++) {
-			n.el.elementAt(i).accept(this);
-		}
+		Type t1 = n.e.accept(this);
+		IdentifierType t;
+		if (t1 instanceof IdentifierType) {
+			t = (IdentifierType) t1;
+			if (!symbolTable.containsClass(t.s)) new TypeDoesntExistException(t.s).printStackTrace();
+			Class classe = symbolTable.getClass(t.s);
+			n.i.accept(this);
+			Method metodo = symbolTable.getMethod(n.i.s, classe.getId());
+			for (int i = 0; i < n.el.size(); i++) {
+				if (!symbolTable.compareTypes(metodo.getParamAt(i).type(), n.el.elementAt(i).accept(this)))
+					new WrongTypeException().printStackTrace();
+			}
+			return symbolTable.getMethodType(n.i.s, classe.getId());
+		} else new WrongTypeException().printStackTrace();
 		return null;
 	}
 
