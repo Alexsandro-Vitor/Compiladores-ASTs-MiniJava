@@ -128,7 +128,7 @@ public class avscVisitor {
 		case "[": return new ArrayLookup(exp1, exp2);
 		}
 		switch (ctx.getChild(2).getText()) {
-		case "length": return new ArrayLength(exp1);
+			case "length": return new ArrayLength(exp1);
 		}
 		if (ctx.getChildCount() > 4) {
 			if (exp1 == null) exp1 = new This();

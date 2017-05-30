@@ -18,7 +18,7 @@ import visitor.TypeCheckVisitor;
 public class Main {
 
 	public static void main(String[] args) throws IOException {
-		InputStream stream = new FileInputStream("BinaryTree.java");
+		InputStream stream = new FileInputStream("QuickSort.java");
 		ANTLRInputStream input = new ANTLRInputStream(stream);
 		avscLexer lexer = new avscLexer(input);
 		CommonTokenStream token = new CommonTokenStream(lexer);
