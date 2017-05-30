@@ -34,11 +34,8 @@ assign: IDENTIFIER '=' expression ';';
 
 arrayAssign: IDENTIFIER '[' expression ']' '=' expression ';';
 
-expression: 'true'
-		| 'false'
-		| 'this'
+expression: '(' expression ')'
 		| not
-		| '(' expression ')'
 		| IDENTIFIER
 		| INTEGER_LITERAL
 		| expression ( '&&' | '<' | '+' | '-' | '*' ) expression
@@ -46,7 +43,11 @@ expression: 'true'
 		| newArray
 		| expression '.' 'length'
 		| newObject
-		| expression '.' IDENTIFIER '(' ( expression ( ',' expression )* )? ')';
+		| expression '.' IDENTIFIER '(' ( expression ( ',' expression )* )? ')'
+		| 'true'
+		| 'false'
+		| 'this'
+		;
 		
 not: '!' expression;
 		

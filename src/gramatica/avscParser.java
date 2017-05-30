@@ -26,7 +26,7 @@ public class avscParser extends Parser {
 	public static final String[] tokenNames = {
 		"<INVALID>", "'main'", "'length'", "'new'", "'true'", "'return'", "'class'", 
 		"'while'", "';'", "'void'", "'{'", "'&&'", "'='", "'extends'", "'}'", 
-		"'if'", "'int'", "'('", "'*'", "'this'", "','", "'.'", "'false'", "'boolean'", 
+		"'if'", "'int'", "'('", "'*'", "'this'", "','", "'false'", "'.'", "'boolean'", 
 		"'System.out.println'", "'['", "'<'", "'String'", "']'", "'public'", "'!'", 
 		"'static'", "'else'", "')'", "'+'", "'-'", "IDENTIFIER", "INTEGER_LITERAL", 
 		"SINGLE_LINE_COMMENT", "MULTI_LINE_COMMENT", "WHITESPACE"
@@ -872,11 +872,11 @@ public class avscParser extends Parser {
 		public NewArrayContext newArray() {
 			return getRuleContext(NewArrayContext.class,0);
 		}
-		public NotContext not() {
-			return getRuleContext(NotContext.class,0);
-		}
 		public ExpressionContext expression(int i) {
 			return getRuleContext(ExpressionContext.class,i);
+		}
+		public NotContext not() {
+			return getRuleContext(NotContext.class,0);
 		}
 		public List<ExpressionContext> expression() {
 			return getRuleContexts(ExpressionContext.class);
@@ -916,49 +916,49 @@ public class avscParser extends Parser {
 			switch ( getInterpreter().adaptivePredict(_input,11,_ctx) ) {
 			case 1:
 				{
-				setState(179); match(T__31);
+				setState(179); match(T__18);
+				setState(180); expression(0);
+				setState(181); match(T__2);
 				}
 				break;
 			case 2:
 				{
-				setState(180); match(T__13);
+				setState(183); not();
 				}
 				break;
 			case 3:
 				{
-				setState(181); match(T__16);
+				setState(184); match(IDENTIFIER);
 				}
 				break;
 			case 4:
 				{
-				setState(182); not();
+				setState(185); match(INTEGER_LITERAL);
 				}
 				break;
 			case 5:
 				{
-				setState(183); match(T__18);
-				setState(184); expression(0);
-				setState(185); match(T__2);
+				setState(186); newArray();
 				}
 				break;
 			case 6:
 				{
-				setState(187); match(IDENTIFIER);
+				setState(187); newObject();
 				}
 				break;
 			case 7:
 				{
-				setState(188); match(INTEGER_LITERAL);
+				setState(188); match(T__31);
 				}
 				break;
 			case 8:
 				{
-				setState(189); newArray();
+				setState(189); match(T__14);
 				}
 				break;
 			case 9:
 				{
-				setState(190); newObject();
+				setState(190); match(T__16);
 				}
 				break;
 			}
@@ -978,14 +978,14 @@ public class avscParser extends Parser {
 						_localctx = new ExpressionContext(_parentctx, _parentState);
 						pushNewRecursionContext(_localctx, _startState, RULE_expression);
 						setState(193);
-						if (!(precpred(_ctx, 6))) throw new FailedPredicateException(this, "precpred(_ctx, 6)");
+						if (!(precpred(_ctx, 9))) throw new FailedPredicateException(this, "precpred(_ctx, 9)");
 						setState(194);
 						_la = _input.LA(1);
 						if ( !((((_la) & ~0x3f) == 0 && ((1L << _la) & ((1L << T__24) | (1L << T__17) | (1L << T__9) | (1L << T__1) | (1L << T__0))) != 0)) ) {
 						_errHandler.recoverInline(this);
 						}
 						consume();
-						setState(195); expression(7);
+						setState(195); expression(10);
 						}
 						break;
 					case 2:
@@ -993,7 +993,7 @@ public class avscParser extends Parser {
 						_localctx = new ExpressionContext(_parentctx, _parentState);
 						pushNewRecursionContext(_localctx, _startState, RULE_expression);
 						setState(196);
-						if (!(precpred(_ctx, 5))) throw new FailedPredicateException(this, "precpred(_ctx, 5)");
+						if (!(precpred(_ctx, 8))) throw new FailedPredicateException(this, "precpred(_ctx, 8)");
 						setState(197); match(T__10);
 						setState(198); expression(0);
 						setState(199); match(T__7);
@@ -1004,8 +1004,8 @@ public class avscParser extends Parser {
 						_localctx = new ExpressionContext(_parentctx, _parentState);
 						pushNewRecursionContext(_localctx, _startState, RULE_expression);
 						setState(201);
-						if (!(precpred(_ctx, 3))) throw new FailedPredicateException(this, "precpred(_ctx, 3)");
-						setState(202); match(T__14);
+						if (!(precpred(_ctx, 6))) throw new FailedPredicateException(this, "precpred(_ctx, 6)");
+						setState(202); match(T__13);
 						setState(203); match(T__33);
 						}
 						break;
@@ -1014,13 +1014,13 @@ public class avscParser extends Parser {
 						_localctx = new ExpressionContext(_parentctx, _parentState);
 						pushNewRecursionContext(_localctx, _startState, RULE_expression);
 						setState(204);
-						if (!(precpred(_ctx, 1))) throw new FailedPredicateException(this, "precpred(_ctx, 1)");
-						setState(205); match(T__14);
+						if (!(precpred(_ctx, 4))) throw new FailedPredicateException(this, "precpred(_ctx, 4)");
+						setState(205); match(T__13);
 						setState(206); match(IDENTIFIER);
 						setState(207); match(T__18);
 						setState(216);
 						_la = _input.LA(1);
-						if ((((_la) & ~0x3f) == 0 && ((1L << _la) & ((1L << T__32) | (1L << T__31) | (1L << T__18) | (1L << T__16) | (1L << T__13) | (1L << T__5) | (1L << IDENTIFIER) | (1L << INTEGER_LITERAL))) != 0)) {
+						if ((((_la) & ~0x3f) == 0 && ((1L << _la) & ((1L << T__32) | (1L << T__31) | (1L << T__18) | (1L << T__16) | (1L << T__14) | (1L << T__5) | (1L << IDENTIFIER) | (1L << INTEGER_LITERAL))) != 0)) {
 							{
 							setState(208); expression(0);
 							setState(213);
@@ -1191,10 +1191,10 @@ public class avscParser extends Parser {
 	}
 	private boolean expression_sempred(ExpressionContext _localctx, int predIndex) {
 		switch (predIndex) {
-		case 0: return precpred(_ctx, 6);
-		case 1: return precpred(_ctx, 5);
-		case 2: return precpred(_ctx, 3);
-		case 3: return precpred(_ctx, 1);
+		case 0: return precpred(_ctx, 9);
+		case 1: return precpred(_ctx, 8);
+		case 2: return precpred(_ctx, 6);
+		case 3: return precpred(_ctx, 4);
 		}
 		return true;
 	}
@@ -1255,28 +1255,28 @@ public class avscParser extends Parser {
 		"\u00ab\31\3\2\2\2\u00ac\u00ad\7&\2\2\u00ad\u00ae\7\33\2\2\u00ae\u00af"+
 		"\5\34\17\2\u00af\u00b0\7\36\2\2\u00b0\u00b1\7\16\2\2\u00b1\u00b2\5\34"+
 		"\17\2\u00b2\u00b3\7\n\2\2\u00b3\33\3\2\2\2\u00b4\u00b5\b\17\1\2\u00b5"+
-		"\u00c2\7\6\2\2\u00b6\u00c2\7\30\2\2\u00b7\u00c2\7\25\2\2\u00b8\u00c2\5"+
-		"\36\20\2\u00b9\u00ba\7\23\2\2\u00ba\u00bb\5\34\17\2\u00bb\u00bc\7#\2\2"+
-		"\u00bc\u00c2\3\2\2\2\u00bd\u00c2\7&\2\2\u00be\u00c2\7\'\2\2\u00bf\u00c2"+
-		"\5 \21\2\u00c0\u00c2\5\"\22\2\u00c1\u00b4\3\2\2\2\u00c1\u00b6\3\2\2\2"+
-		"\u00c1\u00b7\3\2\2\2\u00c1\u00b8\3\2\2\2\u00c1\u00b9\3\2\2\2\u00c1\u00bd"+
-		"\3\2\2\2\u00c1\u00be\3\2\2\2\u00c1\u00bf\3\2\2\2\u00c1\u00c0\3\2\2\2\u00c2"+
-		"\u00df\3\2\2\2\u00c3\u00c4\f\b\2\2\u00c4\u00c5\t\2\2\2\u00c5\u00de\5\34"+
-		"\17\t\u00c6\u00c7\f\7\2\2\u00c7\u00c8\7\33\2\2\u00c8\u00c9\5\34\17\2\u00c9"+
-		"\u00ca\7\36\2\2\u00ca\u00de\3\2\2\2\u00cb\u00cc\f\5\2\2\u00cc\u00cd\7"+
-		"\27\2\2\u00cd\u00de\7\4\2\2\u00ce\u00cf\f\3\2\2\u00cf\u00d0\7\27\2\2\u00d0"+
-		"\u00d1\7&\2\2\u00d1\u00da\7\23\2\2\u00d2\u00d7\5\34\17\2\u00d3\u00d4\7"+
-		"\26\2\2\u00d4\u00d6\5\34\17\2\u00d5\u00d3\3\2\2\2\u00d6\u00d9\3\2\2\2"+
-		"\u00d7\u00d5\3\2\2\2\u00d7\u00d8\3\2\2\2\u00d8\u00db\3\2\2\2\u00d9\u00d7"+
-		"\3\2\2\2\u00da\u00d2\3\2\2\2\u00da\u00db\3\2\2\2\u00db\u00dc\3\2\2\2\u00dc"+
-		"\u00de\7#\2\2\u00dd\u00c3\3\2\2\2\u00dd\u00c6\3\2\2\2\u00dd\u00cb\3\2"+
-		"\2\2\u00dd\u00ce\3\2\2\2\u00de\u00e1\3\2\2\2\u00df\u00dd\3\2\2\2\u00df"+
-		"\u00e0\3\2\2\2\u00e0\35\3\2\2\2\u00e1\u00df\3\2\2\2\u00e2\u00e3\7 \2\2"+
-		"\u00e3\u00e4\5\34\17\2\u00e4\37\3\2\2\2\u00e5\u00e6\7\5\2\2\u00e6\u00e7"+
-		"\7\22\2\2\u00e7\u00e8\7\33\2\2\u00e8\u00e9\5\34\17\2\u00e9\u00ea\7\36"+
-		"\2\2\u00ea!\3\2\2\2\u00eb\u00ec\7\5\2\2\u00ec\u00ed\7&\2\2\u00ed\u00ee"+
-		"\7\23\2\2\u00ee\u00ef\7#\2\2\u00ef#\3\2\2\2\22(AGMbelr\u0080\u0088\u008e"+
-		"\u00c1\u00d7\u00da\u00dd\u00df";
+		"\u00b6\7\23\2\2\u00b6\u00b7\5\34\17\2\u00b7\u00b8\7#\2\2\u00b8\u00c2\3"+
+		"\2\2\2\u00b9\u00c2\5\36\20\2\u00ba\u00c2\7&\2\2\u00bb\u00c2\7\'\2\2\u00bc"+
+		"\u00c2\5 \21\2\u00bd\u00c2\5\"\22\2\u00be\u00c2\7\6\2\2\u00bf\u00c2\7"+
+		"\27\2\2\u00c0\u00c2\7\25\2\2\u00c1\u00b4\3\2\2\2\u00c1\u00b9\3\2\2\2\u00c1"+
+		"\u00ba\3\2\2\2\u00c1\u00bb\3\2\2\2\u00c1\u00bc\3\2\2\2\u00c1\u00bd\3\2"+
+		"\2\2\u00c1\u00be\3\2\2\2\u00c1\u00bf\3\2\2\2\u00c1\u00c0\3\2\2\2\u00c2"+
+		"\u00df\3\2\2\2\u00c3\u00c4\f\13\2\2\u00c4\u00c5\t\2\2\2\u00c5\u00de\5"+
+		"\34\17\f\u00c6\u00c7\f\n\2\2\u00c7\u00c8\7\33\2\2\u00c8\u00c9\5\34\17"+
+		"\2\u00c9\u00ca\7\36\2\2\u00ca\u00de\3\2\2\2\u00cb\u00cc\f\b\2\2\u00cc"+
+		"\u00cd\7\30\2\2\u00cd\u00de\7\4\2\2\u00ce\u00cf\f\6\2\2\u00cf\u00d0\7"+
+		"\30\2\2\u00d0\u00d1\7&\2\2\u00d1\u00da\7\23\2\2\u00d2\u00d7\5\34\17\2"+
+		"\u00d3\u00d4\7\26\2\2\u00d4\u00d6\5\34\17\2\u00d5\u00d3\3\2\2\2\u00d6"+
+		"\u00d9\3\2\2\2\u00d7\u00d5\3\2\2\2\u00d7\u00d8\3\2\2\2\u00d8\u00db\3\2"+
+		"\2\2\u00d9\u00d7\3\2\2\2\u00da\u00d2\3\2\2\2\u00da\u00db\3\2\2\2\u00db"+
+		"\u00dc\3\2\2\2\u00dc\u00de\7#\2\2\u00dd\u00c3\3\2\2\2\u00dd\u00c6\3\2"+
+		"\2\2\u00dd\u00cb\3\2\2\2\u00dd\u00ce\3\2\2\2\u00de\u00e1\3\2\2\2\u00df"+
+		"\u00dd\3\2\2\2\u00df\u00e0\3\2\2\2\u00e0\35\3\2\2\2\u00e1\u00df\3\2\2"+
+		"\2\u00e2\u00e3\7 \2\2\u00e3\u00e4\5\34\17\2\u00e4\37\3\2\2\2\u00e5\u00e6"+
+		"\7\5\2\2\u00e6\u00e7\7\22\2\2\u00e7\u00e8\7\33\2\2\u00e8\u00e9\5\34\17"+
+		"\2\u00e9\u00ea\7\36\2\2\u00ea!\3\2\2\2\u00eb\u00ec\7\5\2\2\u00ec\u00ed"+
+		"\7&\2\2\u00ed\u00ee\7\23\2\2\u00ee\u00ef\7#\2\2\u00ef#\3\2\2\2\22(AGM"+
+		"belr\u0080\u0088\u008e\u00c1\u00d7\u00da\u00dd\u00df";
 	public static final ATN _ATN =
 		new ATNDeserializer().deserialize(_serializedATN.toCharArray());
 	static {
