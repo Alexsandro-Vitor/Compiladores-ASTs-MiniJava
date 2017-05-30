@@ -8,20 +8,20 @@ import ast.*;
 import gramatica.avscParser.*;
 
 public class avscVisitor {
-	
+
 	public Program visit(GoalContext ctx) {
 		MainClass main = this.visit(ctx.mainClass());
 		ClassDeclList classes = getClassDeclList(ctx.classDeclaration());
 		return new Program(main, classes);
 	}
-	
+
 	public MainClass visit(MainClassContext ctx) {
 		Identifier id1 = new Identifier(ctx.IDENTIFIER(0).getText());
 		Identifier id2 = new Identifier(ctx.IDENTIFIER(1).getText());
 		Statement st = this.visit(ctx.statement());
 		return new MainClass(id1, id2, st);
 	}
-	
+
 	public ClassDecl visit(ClassDeclarationContext ctx) {
 		Identifier id1 = new Identifier(ctx.IDENTIFIER(0).getText());
 		VarDeclList var = getVarDeclList(ctx.varDeclaration());
@@ -30,13 +30,13 @@ public class avscVisitor {
 		Identifier id2 = new Identifier(ctx.IDENTIFIER(1).getText());
 		return new ClassDeclExtends(id1, id2, var, method);
 	}
-	
+
 	public VarDecl visit(VarDeclarationContext ctx) {
 		Type type = this.visit(ctx.type());
 		Identifier id =  new Identifier(ctx.IDENTIFIER().getText());
 		return new VarDecl(type, id);
 	}
-	
+
 	public MethodDecl visit(MethodDeclarationContext ctx) {
 		Type type = this.visit(ctx.type(0));
 		Identifier id = new Identifier(ctx.IDENTIFIER(0).getText());
@@ -46,7 +46,7 @@ public class avscVisitor {
 		Exp exp = this.visit(ctx.expression());
 		return new MethodDecl(type, id, formal, var, statement, exp);
 	}
-	
+
 	public Type visit(TypeContext ctx) {
 		String tipo = "";
 		for (int i = 0; i < ctx.getChildCount(); i++) {
@@ -57,7 +57,7 @@ public class avscVisitor {
 		if (tipo.equals("boolean")) return new BooleanType();
 		return new IdentifierType(tipo);
 	}
-	
+
 	public Statement visit(StatementContext ctx) {
 		if (ctx.statementList() != null) return new Block((StatementList) this.visit(ctx.statementList()));
 		if (ctx.ifElse() != null) return this.visit(ctx.ifElse());
@@ -67,54 +67,55 @@ public class avscVisitor {
 		if (ctx.arrayAssign() != null) return this.visit(ctx.arrayAssign());
 		return null;
 	}
-	
+
 	public StatementList visit(StatementListContext ctx) {
 		return getStatementList(ctx.statement());
 	}
-	
+
 	public If visit(IfElseContext ctx) {
 		Exp exp = this.visit(ctx.expression());
 		Statement st1 = this.visit(ctx.statement(0));
 		Statement st2 = this.visit(ctx.statement(1));
 		return new If(exp, st1, st2);
 	}
-	
+
 	public While visit(WhileLoopContext ctx) {
 		Exp exp = this.visit(ctx.expression());
 		Statement st = this.visit(ctx.statement());
 		return new While(exp, st);
 	}
-	
+
 	public Print visit(PrintContext ctx) {
 		return new Print(this.visit(ctx.expression()));
 	}
-	
+
 	public Assign visit(AssignContext ctx) {
 		Identifier id = new Identifier(ctx.IDENTIFIER().getText());
 		Exp exp = this.visit(ctx.expression());
 		return new Assign(id, exp);
 	}
-	
+
 	public ArrayAssign visit(ArrayAssignContext ctx) {
 		Identifier id = new Identifier(ctx.IDENTIFIER().getText());
 		Exp exp1 = this.visit(ctx.expression(0));
 		Exp exp2 = this.visit(ctx.expression(1));
 		return new ArrayAssign(id, exp1, exp2);
 	}
-	
+
 	public Exp visit(ExpressionContext ctx) {
 		if (ctx == null) return null;
 		Exp exp1 = this.visit(ctx.expression(0));
 		Exp exp2 = this.visit(ctx.expression(1));
 		IntegerLiteral int_lit = (ctx.INTEGER_LITERAL() != null) ? new IntegerLiteral(Integer.parseInt(ctx.INTEGER_LITERAL().getText())) : null;
-		switch (ctx.getChild(0).getText()) {
-		case "true": return new True();
-		case "false": return new False();
-		case "this": return new This();
-		case "(": return exp1;
-		}
 		if (ctx.not() != null) return (Not) this.visit(ctx.not());
+		if (ctx.newArray() != null) return (NewArray) this.visit(ctx.newArray());
+		if (ctx.newObject() != null) return (NewObject) this.visit(ctx.newObject());
 		if (ctx.getChildCount() == 1) {
+			switch (ctx.getChild(0).getText()) {
+			case "true": return new True();
+			case "false": return new False();
+			case "this": return new This();
+			}
 			if (ctx.IDENTIFIER() != null) return new IdentifierExp(ctx.IDENTIFIER().getText());
 			return int_lit;
 		}
@@ -126,22 +127,25 @@ public class avscVisitor {
 		case "*": return new Times(exp1, exp2);
 		case "[": return new ArrayLookup(exp1, exp2);
 		}
-		if (ctx.newArray() != null) return (NewArray) this.visit(ctx.newArray());
 		switch (ctx.getChild(2).getText()) {
 		case "length": return new ArrayLength(exp1);
 		}
-		if (ctx.newObject() != null) return (NewObject) this.visit(ctx.newObject());
-		return new Call(exp1, new Identifier(ctx.IDENTIFIER().getText()), getExpList(ctx.expression()));
+		if (ctx.getChildCount() > 4) {
+			if (exp1 == null) exp1 = new This();
+			return new Call(exp1, new Identifier(ctx.IDENTIFIER().getText()), getExpList(ctx.expression()));
+		}
+		if (ctx.getChild(0).getText().equals("(")) return exp1;
+		return null;
 	}
-	
+
 	public Object visit(NotContext ctx) {
 		return new Not(this.visit(ctx.expression()));
 	}
-	
+
 	public Object visit(NewArrayContext ctx) {
 		return new NewArray(this.visit(ctx.expression()));
 	}
-	
+
 	public Object visit(NewObjectContext ctx) {
 		return new NewObject(new Identifier(ctx.IDENTIFIER().getText()));
 	}
@@ -153,7 +157,7 @@ public class avscVisitor {
 		}
 		return classe;
 	}
-	
+
 	private VarDeclList getVarDeclList(List<VarDeclarationContext> list) {
 		VarDeclList var = new VarDeclList();
 		for (int i = 0; i < list.size(); i++) {
@@ -161,7 +165,7 @@ public class avscVisitor {
 		}
 		return var;
 	}
-	
+
 	private MethodDeclList getMethodDeclList(List<MethodDeclarationContext> list) {
 		MethodDeclList method = new MethodDeclList();
 		for (int i = 0; i < list.size(); i++) {
@@ -169,7 +173,7 @@ public class avscVisitor {
 		}
 		return method;
 	}
-	
+
 	private FormalList getFormalList(List<TypeContext> type, List<TerminalNode> identifier) {
 		FormalList formal = new FormalList();
 		for (int i = 1; i < type.size(); i++) {
@@ -177,7 +181,7 @@ public class avscVisitor {
 		}
 		return formal;
 	}
-	
+
 	private StatementList getStatementList(List<StatementContext> list) {
 		StatementList statement = new StatementList();
 		for (int i = 0; i < list.size(); i++) {
@@ -185,7 +189,7 @@ public class avscVisitor {
 		}
 		return statement;
 	}
-	
+
 	private ExpList getExpList(List<ExpressionContext> list) {
 		ExpList exp = new ExpList();
 		for (int i = 1; i < list.size(); i++) {

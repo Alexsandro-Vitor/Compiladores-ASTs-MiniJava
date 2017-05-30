@@ -281,6 +281,7 @@ public class BuildSymbolTableVisitor implements Visitor {
 
 	// Identifier i;
 	public void visit(NewObject n) {
+		
 	}
 
 	// Exp e;

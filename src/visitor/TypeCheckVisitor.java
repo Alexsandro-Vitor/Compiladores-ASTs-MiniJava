@@ -188,9 +188,8 @@ public class TypeCheckVisitor implements TypeVisitor {
 		if (t instanceof BooleanType) return "boolean";
 		else if (t instanceof IntegerType) return "int";
 		else if (t instanceof IntArrayType) return "int[]";
-		else {
-			return ((IdentifierType) t).s;
-		}
+		else if (t instanceof IdentifierType) return ((IdentifierType) t).s;
+		return null;
 	}
 
 	// Exp e;
@@ -312,7 +311,7 @@ public class TypeCheckVisitor implements TypeVisitor {
 				if (!symbolTable.compareTypes(metodo.getParamAt(i).type(), n.el.elementAt(i).accept(this)))
 					new WrongTypeException().printStackTrace();
 			}
-			return symbolTable.getMethodType(n.i.s, classe.getId());
+			return metodo.type();
 		} else new WrongTypeException().printStackTrace();
 		return null;
 	}
@@ -342,7 +341,7 @@ public class TypeCheckVisitor implements TypeVisitor {
 	// Exp e;
 	public Type visit(NewArray n) {
 		if (!(n.e.accept(this) instanceof IntegerType)) new WrongTypeException().printStackTrace();
-		return null;
+		return new IntArrayType();
 	}
 
 	// Identifier i;
